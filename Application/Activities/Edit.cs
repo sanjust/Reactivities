@@ -49,12 +49,11 @@ namespace Application.Activities
                     activity.Venue = request.Venue ?? activity.Venue;
 
                     var success = await _context.SaveChangesAsync() > 0;
-                    if (success) return Unit.Value;
-                    throw new Exception("Problem saving changes");
+                    return Unit.Value;
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("Problem saving changes");
+                    return Unit.Value;
                 }
             }
         }
