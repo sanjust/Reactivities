@@ -1,32 +1,30 @@
-import React from 'react'
-import { Button, Card, Icon, Image } from 'semantic-ui-react'
-import { IActivity } from '../../../app/models/activity'
+import { observer } from 'mobx-react-lite';
+import React, { useContext } from 'react'
+import { Button, Card, Image } from 'semantic-ui-react'
+import ActivityStore from '../../../app/stores/activityStore';
 
-interface IProps {
-    activity: IActivity;
-    setEditMode: (editMode: boolean) => void;
-    setSelectedActivity: (activity: IActivity | null) => void;
-}
-
-export const ActivityDetails: React.FC<IProps> = (props) => {
+const ActivityDetails = () => {
+    const activityStore = useContext(ActivityStore);
+    const { selectedActivity, setEditMode, setSelectedActivity } = activityStore;
     return (
         <Card fluid>
-            <Image src={`/assets/categoryImages/${props.activity.category}.jpg`} wrapped ui={false} />
+            <Image src={`/assets/categoryImages/${selectedActivity.category}.jpg`} wrapped ui={false} />
             <Card.Content>
-                <Card.Header>{props.activity.title}</Card.Header>
+                <Card.Header>{selectedActivity.title}</Card.Header>
                 <Card.Meta>
-                    <span>{props.activity.date}</span>
+                    <span>{selectedActivity.date}</span>
                 </Card.Meta>
                 <Card.Description>
-                    {props.activity.description}
+                    {selectedActivity.description}
                 </Card.Description>
             </Card.Content>
             <Card.Content extra>
                 <Button.Group widths={2}>
-                    <Button basic color='blue' content='Edit' onClick={() => { props.setEditMode(true) }} />
-                    <Button basic color='grey' content='Cancel' onClick={() => { props.setSelectedActivity(null) }} />
+                    <Button basic color='blue' content='Edit' onClick={() => { setEditMode(true) }} />
+                    <Button basic color='grey' content='Cancel' onClick={() => { setSelectedActivity(null) }} />
                 </Button.Group>
             </Card.Content>
         </Card>
     )
 }
+export default observer(ActivityDetails);

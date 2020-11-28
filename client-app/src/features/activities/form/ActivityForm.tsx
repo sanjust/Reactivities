@@ -1,20 +1,17 @@
-import React, { FormEvent } from 'react'
+import { observer } from 'mobx-react-lite';
+import React, { FormEvent, useContext } from 'react'
 import { Button, Form, Segment } from 'semantic-ui-react'
 import { v4 as uuid } from 'uuid';
 import { IActivity } from '../../../app/models/activity'
+import ActivityStore from '../../../app/stores/activityStore';
 
-interface IProps {
-    setEditMode: (editMode: boolean) => void;
-    activity: IActivity;
-    createActivity: (activity: IActivity) => void;
-    editActivity: (activity: IActivity) => void;
-    submitting: boolean;
-}
+const ActivityForm = () => {
+    const activityStore = useContext(ActivityStore);
+    const { selectedActivity, setEditMode, submitting, createActivity, editActivity } = activityStore;
 
-export const ActivityForm: React.FC<IProps> = (props) => {
     const initializeForm = () => {
-        if (props.activity) {
-            return props.activity;
+        if (selectedActivity) {
+            return selectedActivity;
         } else {
             let activity: IActivity = {
                 id: '',
@@ -37,9 +34,9 @@ export const ActivityForm: React.FC<IProps> = (props) => {
                 ...activity,
                 id: uuid()
             }
-            props.createActivity(newActivity);
+            createActivity(newActivity);
         } else {
-            props.editActivity(activity);
+            editActivity(activity);
         }
     }
 
@@ -57,9 +54,11 @@ export const ActivityForm: React.FC<IProps> = (props) => {
                 <Form.Input onChange={handleInputChange} type='datetime-local' placeholder='Date' name='date' value={activity.date} />
                 <Form.Input onChange={handleInputChange} placeholder='City' name='city' value={activity.city} />
                 <Form.Input onChange={handleInputChange} placeholder='Venue' name='venue' value={activity.venue} />
-                <Button loading={props.submitting} floated='right' positive type='submit' content='Submit' onClick={handleSubmit} />
-                <Button floated='left' type='submit' content='Cancel' onClick={() => { props.setEditMode(false) }} />
+                <Button loading={submitting} floated='right' positive type='submit' content='Submit' onClick={handleSubmit} />
+                <Button floated='left' type='submit' content='Cancel' onClick={() => { setEditMode(false) }} />
             </Form>
         </Segment>
     )
 }
+
+export default observer(ActivityForm);
