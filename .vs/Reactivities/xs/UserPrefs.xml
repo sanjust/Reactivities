@@ -1,23 +1,22 @@
 ﻿<Properties StartupConfiguration="{4A04196D-CA2B-43BF-9CE8-5CD05E9BDA28}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="API/Controllers/ValuesController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="API/Startup.cs">
     <Files>
-      <File FileName="API/Startup.cs" />
+      <File FileName="API/Startup.cs" Line="5" Column="30" />
       <File FileName="API/API.csproj" />
       <File FileName="Application/Application.csproj" />
       <File FileName="Domain/Domain.csproj" />
       <File FileName="Persistence/Persistence.csproj" />
       <File FileName="Persistence/DataContext.cs" />
       <File FileName="API/appsettings.json" />
-      <File FileName="API/Controllers/ValuesController.cs" Line="22" Column="66" />
+      <File FileName="API/Controllers/ValuesController.cs" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="Reactivities" expanded="True">
             <Node name="API" expanded="True">
-              <Node name="Controllers" expanded="True">
-                <Node name="ValuesController.cs" selected="True" />
-              </Node>
+              <Node name="Controllers" expanded="True" />
+              <Node name="Startup.cs" selected="True" />
             </Node>
             <Node name="Application" expanded="True" />
             <Node name="Persistence" expanded="True" />
