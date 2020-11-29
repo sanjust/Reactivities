@@ -1,22 +1,28 @@
 import { observer } from 'mobx-react-lite'
-import React, { SyntheticEvent, useContext } from 'react'
+import React, { useContext } from 'react'
 import { Grid } from 'semantic-ui-react'
-import ActivityDetails from '../Details/ActivityDetails'
-import ActivityForm from '../form/ActivityForm'
+
 import { ActivityList } from './ActivityList'
 import ActivityStore from '../../../app/stores/activityStore';
+import { LoadingComponent } from '../../../app/layout/LoadingComponent';
 
 const ActivityDashboard = () => {
     const activityStore = useContext(ActivityStore);
-    const { editMode, selectedActivity, submitting } = activityStore;
+    const { submitting } = activityStore;
+
+    React.useEffect(() => {
+        activityStore.loadActivities();
+    }, [activityStore]);
+
+    if (activityStore.loadingInitial) return <LoadingComponent content='Loading activities...' />
+
     return (
         <Grid>
             <Grid.Column width={10}>
-                <ActivityList />
+                <ActivityList key={submitting.toString()} />
             </Grid.Column>
             <Grid.Column width={6}>
-                {selectedActivity && !editMode && <ActivityDetails />}
-                {editMode && <ActivityForm key={selectedActivity && selectedActivity.id || 0} />}
+                <h2>Activity filters</h2>
             </Grid.Column>
         </Grid>
     )

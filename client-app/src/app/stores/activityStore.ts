@@ -7,10 +7,8 @@ configure({ enforceActions: 'always' });
 
 class ActivityStore {
     @observable activityRegistry = new Map();
-    @observable activities: IActivity[] = [];
-    @observable selectedActivity: IActivity | null = null;
+    @observable activity: IActivity | null = null;
     @observable loadingInitial = false;
-    @observable editMode = false;
     @observable submitting = false;
     @observable target = null;
 
@@ -40,19 +38,47 @@ class ActivityStore {
         }
     }
 
+    @action loadActivity = async (id: string) => {
+        let activity = this.getActivity(id);
+        if (activity) {
+            this.activity = activity;
+        } else {
+            this.loadingInitial = true;
+            try {
+                activity = await agent.Activities.details(id);
+                runInAction(() => {
+                    this.activity = activity;
+                    this.loadingInitial = false;
+                })
+            } catch (error) {
+                runInAction(() => {
+                    this.loadingInitial = false
+                })
+                console.log(error);
+            }
+        }
+    }
+
+    @action clearActivity = () => {
+        this.activity = null;
+    }
+
+    getActivity = (id: string) => {
+        return this.activityRegistry.get(id);
+    }
+
     @action createActivity = async (activity: IActivity) => {
         this.submitting = true;
         try {
             await agent.Activities.create(activity);
             runInAction(() => {
                 this.activityRegistry.set(activity.id, activity);
-                this.selectedActivity = activity;
-                this.editMode = false;
+                this.activity = activity;
                 this.submitting = false;
             })
         } catch (error) {
             runInAction(() => {
-                this.editMode = false;
+                this.submitting = false;
             })
         }
     }
@@ -63,13 +89,12 @@ class ActivityStore {
             await agent.Activities.update(activity);
             runInAction(() => {
                 this.activityRegistry.set(activity.id, activity);
-                this.selectedActivity = activity;
-                this.editMode = false;
+                this.activity = activity;
                 this.submitting = false;
             })
         } catch (error) {
             runInAction(() => {
-                this.editMode = false;
+                this.submitting = false;
             })
         }
     }
@@ -82,33 +107,15 @@ class ActivityStore {
             runInAction(() => {
                 this.activityRegistry.delete(id);
                 this.submitting = false;
-                if (this.selectedActivity && this.selectedActivity.id === id) {
-                    this.selectedActivity = null;
+                if (this.activity && this.activity.id === id) {
+                    this.activity = null;
                 }
             })
         } catch (error) {
             runInAction(() => {
-                this.editMode = false;
+                this.submitting = false;
             })
         }
-    }
-
-    @action selectActivity = (id: string) => {
-        this.selectedActivity = this.activityRegistry.get(id);
-        this.editMode = false;
-    }
-
-    @action handleOpenCreateForm = () => {
-        this.selectedActivity = null;
-        this.editMode = true;
-    }
-
-    @action setEditMode = (mode: boolean) => {
-        this.editMode = mode;
-    }
-
-    @action setSelectedActivity = (activity: IActivity | null) => {
-        this.selectedActivity = activity;
     }
 }
 export default createContext(new ActivityStore());
