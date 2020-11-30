@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
-    [ApiController]
+    //  [ApiController]
     public class ActivitiesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -37,6 +37,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Unit>> Create([FromBody] Create.Command activity)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             return await _mediator.Send(activity);
         }
 

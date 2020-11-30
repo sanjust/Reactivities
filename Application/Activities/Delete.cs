@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Errors;
 using Domain;
 using MediatR;
 using Persistence;
@@ -31,7 +32,7 @@ namespace Application.Activities
                 var activity = _context.Activities.Find(request.Id);
 
                 if (activity == null)
-                    throw new Exception("Activity Not found");
+                    throw new RestException(System.Net.HttpStatusCode.NotFound, new { activity = "Not found" });
 
                 _context.Remove(activity);
                 var success = await _context.SaveChangesAsync() > 0;
