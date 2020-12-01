@@ -10,10 +10,6 @@ namespace Application.Activities
 {
     public class Create
     {
-        public Create()
-        {
-        }
-
         public class Command : IRequest
         {
             public Guid Id { get; set; }

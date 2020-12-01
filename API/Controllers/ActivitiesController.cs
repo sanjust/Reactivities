@@ -4,31 +4,26 @@ using System.Threading.Tasks;
 using Application.Activities;
 using Domain;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
-    //  [ApiController]
-    public class ActivitiesController : ControllerBase
+    public class ActivitiesController : BaseController
     {
-        private readonly IMediator _mediator;
-        public ActivitiesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
 
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> List()
         {
-            return await _mediator.Send(new List.Query());
+            return await Mediator.Send(new List.Query());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Activity>> List(Guid id)
+        [Authorize]
+        public async Task<ActionResult<Activity>> Details(Guid id)
         {
-            return await _mediator.Send(new Details.Query
+            return await Mediator.Send(new Details.Query
             {
                 Id = id
             });
@@ -39,20 +34,20 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            return await _mediator.Send(activity);
+            return await Mediator.Send(activity);
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<Unit>> Edit(Guid id, Edit.Command activity)
         {
             activity.Id = id;
-            return await _mediator.Send(activity);
+            return await Mediator.Send(activity);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<Unit>> Edit(Guid id)
         {
-            return await _mediator.Send(new Delete.Command
+            return await Mediator.Send(new Delete.Command
             {
                 Id = id
             });
