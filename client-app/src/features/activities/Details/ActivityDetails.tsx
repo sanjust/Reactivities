@@ -4,18 +4,18 @@ import { RouteComponentProps } from 'react-router';
 import { Grid } from 'semantic-ui-react'
 
 import { LoadingComponent } from '../../../app/layout/LoadingComponent';
-import ActivityStore from '../../../app/stores/activityStore';
 import ActivityDetailedHeader from './ActivityDetailedHeader';
 import { ActivityDetailedInfo } from './ActivityDetailedInfo';
 import { ActivityDetailedChat } from './ActivityDetailedChat';
 import { ActivityDetailedSidebar } from './ActivityDetailedSidebar';
+import { RootStoreContext } from '../../../app/stores/rootStore';
 
 interface DetailsParams {
     id: string;
 }
 const ActivityDetails: React.FC<RouteComponentProps<DetailsParams>> = ({ match, history }) => {
-    const activityStore = useContext(ActivityStore);
-    const { activity, loadingInitial, loadActivity } = activityStore;
+    const rootStore = useContext(RootStoreContext);
+    const { activity, loadingInitial, loadActivity } = rootStore.activityStore;
 
     React.useEffect(() => {
         loadActivity(match.params.id)

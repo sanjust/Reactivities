@@ -3,18 +3,18 @@ import React, { useContext } from 'react'
 import { Grid } from 'semantic-ui-react'
 
 import { ActivityList } from './ActivityList'
-import ActivityStore from '../../../app/stores/activityStore';
 import { LoadingComponent } from '../../../app/layout/LoadingComponent';
+import { RootStoreContext } from '../../../app/stores/rootStore';
 
 const ActivityDashboard = () => {
-    const activityStore = useContext(ActivityStore);
-    const { submitting } = activityStore;
+    const rootStore = useContext(RootStoreContext);
+    const { loadActivities, loadingInitial, submitting } = rootStore.activityStore;
 
     React.useEffect(() => {
-        activityStore.loadActivities();
-    }, [activityStore]);
+        loadActivities();
+    }, [rootStore.activityStore]);
 
-    if (activityStore.loadingInitial) return <LoadingComponent content='Loading activities...' />
+    if (loadingInitial) return <LoadingComponent content='Loading activities...' />
 
     return (
         <Grid>
