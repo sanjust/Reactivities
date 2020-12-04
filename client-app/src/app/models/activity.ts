@@ -1,5 +1,3 @@
-import { Interface } from "readline";
-
 
 export interface IActivity {
     id: string;
@@ -9,6 +7,9 @@ export interface IActivity {
     date: Date;
     city: string;
     venue: string;
+    isGoing: boolean;
+    isHost: boolean;
+    attendees: IAttendee[]
 }
 
 // Partial<IActivity> make all properties in parent as optioanl in child
@@ -32,4 +33,11 @@ export class ActivityFormValues implements IActivityFormValues {
         }
         Object.assign(this, init)
     }
+}
+
+export interface IAttendee {
+    username: string;
+    displayName: string;
+    image: string;
+    isHost: boolean
 }

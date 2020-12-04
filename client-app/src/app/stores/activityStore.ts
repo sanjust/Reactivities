@@ -3,6 +3,7 @@ import { SyntheticEvent } from "react";
 import { toast } from "react-toastify";
 import { history } from '../../index';
 import agent from "../api/agent";
+import { createAttendee, setActivityProps } from "../common/util/util";
 import { IActivity } from "../models/activity";
 import { RootStore } from "./rootStore";
 
@@ -17,6 +18,7 @@ export default class ActivityStore {
     @observable activityRegistry = new Map();
     @observable activity: IActivity | null = null;
     @observable loadingInitial = false;
+    @observable loading = false;
     @observable submitting = false;
     @observable target = null;
 
@@ -38,11 +40,12 @@ export default class ActivityStore {
 
     @action loadActivities = async () => {
         this.loadingInitial = true;
+        const user = this.rootStore.userStore.user;
         try {
             const activities = await agent.Activities.list();
             runInAction(() => {
                 activities.forEach(activity => {
-                    activity.date = new Date(activity.date);
+                    setActivityProps(activity, user);
                     this.activityRegistry.set(activity.id, activity);
                 });
                 this.loadingInitial = false;
@@ -56,6 +59,7 @@ export default class ActivityStore {
 
     @action loadActivity = async (id: string) => {
         let activity = this.getActivity(id);
+        const user = this.rootStore.userStore.user;
         if (activity) {
             this.activity = activity;
             return activity;
@@ -64,7 +68,7 @@ export default class ActivityStore {
             try {
                 activity = await agent.Activities.details(id);
                 runInAction(() => {
-                    activity.date = new Date(activity.date)
+                    setActivityProps(activity, user);
                     this.activity = activity;
                     this.activityRegistry.set(activity.id, activity);
                     this.loadingInitial = false;
@@ -91,6 +95,12 @@ export default class ActivityStore {
         this.submitting = true;
         try {
             await agent.Activities.create(activity);
+            const attend = createAttendee(this.rootStore.userStore.user);
+            attend.isHost = true;
+            let attendes = [];
+            attendes.push(attend);
+            activity.attendees = attendes;
+            activity.isHost = true;
             runInAction(() => {
                 this.activityRegistry.set(activity.id, activity);
                 this.activity = activity;
@@ -139,6 +149,49 @@ export default class ActivityStore {
             runInAction(() => {
                 this.submitting = false;
             })
+        }
+    }
+
+    @action attendActivity = async () => {
+        const attendee = createAttendee(this.rootStore.userStore.user);
+        this.loading = true;
+        try {
+            await agent.Activities.attend(this.activity.id);
+            runInAction(() => {
+                this.loading = false;
+                if (this.activity) {
+                    this.activity.attendees.push(attendee);
+                    this.activity.isGoing = true;
+                    this.activityRegistry.set(this.activity.id, this.activity);
+                }
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.loading = false;
+            })
+            toast.error('Problem signing up to activity');
+        }
+    }
+
+    @action cancelAttendance = async () => {
+        this.loading = true;
+        try {
+            await agent.Activities.unAttend(this.activity.id);
+            runInAction(() => {
+                this.loading = false;
+                if (this.activity) {
+                    if (this.activity) {
+                        this.activity.attendees = this.activity.attendees.filter(val => val.username !== this.rootStore.userStore.user.username);
+                        this.activity.isGoing = false
+                        this.activityRegistry.set(this.activity.id, this.activity);
+                    }
+                }
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.loading = false;
+            })
+            toast.error('Problem signing up to activity');
         }
     }
 }
